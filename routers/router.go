@@ -13,6 +13,7 @@ func Router() *gin.Engine {
 	r.LoadHTMLGlob("./templates/**/*")
 	r.Static("/static", "./static")
 
+	r.GET("/", front.Index)
 	// 前端路由
 	frontGroup := r.Group("/front")
 	{
