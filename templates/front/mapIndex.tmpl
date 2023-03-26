@@ -1,0 +1,227 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <link rel="shortcut icon" href="../static/images/favicon.ico">
+    <link rel="stylesheet" href="https://a.amap.com/jsapi_demos/static/demo-center/css/demo-center.css" />
+    <title>{{.title}}</title>
+    <style>
+        html,
+        body,
+        #container {
+            width: 100%;
+            height: 100%;
+        }
+
+        #panel {
+            position: fixed;
+            background-color: white;
+            max-height: 90%;
+            overflow-y: auto;
+            top: 10px;
+            right: 10px;
+            width: 280px;
+        }
+        #panel .amap-call {
+            background-color: #009cf9;
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+        }
+        #panel .amap-lib-driving {
+            border-bottom-left-radius: 4px;
+            border-bottom-right-radius: 4px;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+<div id="container"></div>
+<div id="panel"></div>
+<!--<div class="info">-->
+<!--    <h4 id="status"></h4><hr>-->
+<!--    <p id="result"></p><hr>-->
+<!--    <p >由于众多浏览器已不再支持非安全域的定位请求，为保位成功率和精度，请升级您的站点到HTTPS。</p>-->
+<!--</div>-->
+<!-- 加载地图JSAPI脚本 -->
+<script src="https://a.amap.com/jsapi_demos/static/demo-center/js/demoutils.js"></script>
+<script type="text/javascript" src="https://cache.amap.com/lbs/static/addToolbar.js"></script>
+<script>
+    window._AMapSecurityConfig = {
+        securityJsCode: 'eeae90612a57fd08db359335a62bfb26'
+    }
+</script>
+<script src="https://webapi.amap.com/maps?v=2.0&key=daf342c72858562998370433cbeff7b0"></script>
+<script type="text/javascript">
+    const iconArr = ["", {
+        type: 'image',
+        image: '../static/images/1.png',
+        size: [24, 24],
+
+        anchor: 'bottom-center',
+    }, {
+        type: 'image',
+        image: '../static/images/2.png',
+        size: [24, 24],
+
+        anchor: 'bottom-center',
+    }, {
+        type: 'image',
+        image: '../static/images/3.png',
+        size: [24, 24],
+
+        anchor: 'bottom-center',
+    }, {
+        type: 'image',
+        image: '../static/images/4.png',
+        size: [24, 24],
+
+        anchor: 'bottom-center',
+    }, {
+        type: 'image',
+        image: '../static/images/5.png',
+        size: [24, 24],
+
+        anchor: 'bottom-center',
+    }, {
+        type: 'image',
+        image: '../static/images/6.png',
+        size: [24, 24],
+
+        anchor: 'bottom-center',
+    }];
+
+    // 加载地图
+    const map = new AMap.Map('container', {
+        viewMode: '2D',
+        resizeEnable: true,
+        zoom: 11
+    });
+    // 定位
+    AMap.plugin('AMap.Geolocation', function() {
+        var geolocation = new AMap.Geolocation({
+            enableHighAccuracy: true,// 是否使用高精度定位，默认:true
+            timeout: 10000,          // 超过10秒后停止定位，默认：5s
+            position:'LB',           // 定位按钮的停靠位置
+            offset: [10, 20],        // 定位按钮与设置的停靠位置的偏移量，默认：[10, 20]
+            zoomToAccuracy: false,    // 定位成功后是否自动调整地图视野到定位点
+        });
+
+        map.addControl(geolocation);
+        geolocation.getCurrentPosition(function(status,result){
+            if(status == 'complete'){
+                // onComplete(result)
+            }else{
+                // onError(result)
+            }
+        });
+    });
+
+    // 解析定位结果
+    function onComplete(data) {
+        document.getElementById('status').innerHTML='定位成功'
+        var str = [];
+        str.push('定位结果：' + data.position);
+        str.push('定位类别：' + data.location_type);
+        if(data.accuracy){
+            str.push('精度：' + data.accuracy + ' 米');
+        }
+        //如为IP精确定位结果则没有精度信息
+        str.push('是否经过偏移：' + (data.isConverted ? '是' : '否'));
+        document.getElementById('result').innerHTML = str.join('<br>');
+    }
+    // 解析定位错误信息
+    function onError(data) {
+        document.getElementById('status').innerHTML='定位失败'
+        document.getElementById('result').innerHTML = '失败原因排查信息:'+data.message+'</br>浏览器返回信息：'+data.originMessage;
+    }
+
+    // 地图加载完成
+    map.on('complete', function () {
+        // 创建 AMap.LabelsLayer 图层
+        const layer = new AMap.LabelsLayer({
+            zooms: [3, 20],
+            zIndex: 100,
+            // 关闭标注避让，默认为开启，v1.4.15 新增属性
+            animation: false,
+            // 关闭标注淡入动画，默认为开启，v1.4.15 新增属性
+            collision: false
+        });
+
+        // 将图层添加到地图
+        map.add(layer);
+
+        const markers = [];
+        const positions = {{ .labs }};
+
+        const infoWindow = new AMap.InfoWindow({offset: new AMap.Pixel(0, -8)});
+        // 添加一些分布不均的点到地图上,地图上添加三个点标记，作为参照
+        positions.forEach(function(marker) {
+            const icon_obj = iconArr[marker.status];
+
+            const labelMarker = new AMap.LabelMarker({
+                icon: icon_obj,
+                position: eval(marker.position),
+            });
+
+            // 鼠标滑动事件，在 图标上显示信息
+            labelMarker.content=("<div class ='area'>"+marker.name+"</div><div class ='area'>"+marker.id+"</div>");
+            labelMarker.on('mouseover', function(e){
+                const position = e.data.data && e.data.data.position;
+
+                if(position){
+                    infoWindow.setContent(e.target.content);
+                    infoWindow.open(map, e.target.getPosition());
+                }
+            });
+            // 鼠标离开时间
+            labelMarker.on('mouseout', function(e){
+                // infoWindow.close();
+            });
+
+            markers.push(labelMarker);
+        });
+        // 加载图标层
+        layer.add(markers);
+    });
+
+    // 异步同时加载多个插件
+    // AMap.plugin('AMap.Driving', function() {
+    //     var driving = new AMap.Driving({
+    //         // 驾车路线规划策略，AMap.DrivingPolicy.LEAST_TIME是最快捷模式
+    //         policy: AMap.DrivingPolicy.LEAST_TIME,
+    //         // map 指定将路线规划方案绘制到对应的 AMap.Map 对象上
+    //         map: map,
+    //         // panel 指定将结构化的路线详情数据显示的对应的DOM上，传入值需是DOM的ID
+    //         panel: 'panel',
+    //         autoFitView: true,
+    //     })
+    //
+    //     var points = [
+    //         { keyword: '永旺家园一区北门）',city:'北京' },
+    //         { keyword: '大觉寺桥',city:'北京' }
+    //     ]
+    //
+    //     // driving.setAvoidRoad("北清路")
+    //     driving.setAvoidPolygons([
+    //         [new AMap.LngLat(116.231524,40.069941), new AMap.LngLat(116.231782,40.070011), new AMap.LngLat(116.231739,40.069945), new AMap.LngLat(116.231519,40.0699)],
+    //         [new AMap.LngLat(116.190256,40.06843), new AMap.LngLat(116.190503,40.068455), new AMap.LngLat(116.190508,40.068381), new AMap.LngLat(116.190283,40.068373)],
+    //         [new AMap.LngLat(116.167715,40.068426), new AMap.LngLat(116.167972,40.06843), new AMap.LngLat(116.167736,40.068364), new AMap.LngLat(116.167977,40.068364)],
+    //         [new AMap.LngLat(116.180916,40.050258), new AMap.LngLat(116.181635,40.050085), new AMap.LngLat(116.181625,40.050011), new AMap.LngLat(116.18097,40.050143)],
+    //         [new AMap.LngLat(116.160049,40.068442), new AMap.LngLat(116.160612,40.068438), new AMap.LngLat(116.160601,40.068397), new AMap.LngLat(116.160285,40.068397)],
+    //         [new AMap.LngLat(116.176437,40.104477), new AMap.LngLat(116.176577,40.104559), new AMap.LngLat(116.176657,40.10451), new AMap.LngLat(116.176512,40.104436)],
+    //         [new AMap.LngLat(116.139235,40.065458), new AMap.LngLat(116.139342,40.065487), new AMap.LngLat(116.139423,40.065392), new AMap.LngLat(116.139331,40.065347)],
+    //
+    //     ])
+    //     driving.search(points, function (status, result) {
+    //         console.log("status = ", status)
+    //         console.log("result = ", result)
+    //         // 未出错时，result即是对应的路线规划方案
+    //     })
+    // })
+
+
+</script>
+</body>
+</html>
