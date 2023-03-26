@@ -1,0 +1,13 @@
+appname: go-gin-demo
+
+db:
+  database: test
+  user:     test
+  password: test
+  host:     127.0.0.1
+  port:     3306
+
+redis:
+  host:     127.0.0.1
+  password: 123456
+  port:     6397
