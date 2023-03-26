@@ -18,7 +18,7 @@ labels_data = labels_data.replace('varLabelsData=', '')
 labels_data = labels_data.replace('name', "'name'").replace('position', "'position'").replace('aa', "'aa'").replace('edittime',"'edittime'").replace('href', "'href'").replace(',time', ",'time'")
 labels_data = eval(labels_data)
 
-db = pymysql.connect(host='118.31.3.8', user='cikewang',password='G4/#2?psm.!1@', database='renwoxing', port=3592)
+db = pymysql.connect(host='127.0.0.1', user='test',password='123456', database='test', port=3592)
 # # 使用cursor()方法获取操作游标
 cursor = db.cursor()
 print(len(labels_data))
