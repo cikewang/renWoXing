@@ -3,7 +3,9 @@ package front
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"renWoXing/service/actionService"
 	"renWoXing/service/labelsService"
+	"time"
 )
 
 type lab struct {
@@ -16,9 +18,12 @@ func Index(c *gin.Context) {
 	lab := labelsService.Labels{}
 	labs, _ := lab.Get()
 
+	act := actionService.Action{}
+	actionInfo, _ := act.GetUpdateTime()
 	c.HTML(200, "mapIndex.tmpl", gin.H{
-		"title": "任我行",
-		"labs":  labs,
+		"title":         "任我行",
+		"labs":          labs,
+		"updateTimeStr": time.Unix(int64(actionInfo.UpdateTime), 0).Format("2006-01-02 15:04"),
 	})
 }
 

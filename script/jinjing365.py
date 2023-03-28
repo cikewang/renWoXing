@@ -44,6 +44,14 @@ for val in labels_data:
         # 如果发生错误则回滚
         db.rollback()
 
+# 更新时间
+update_time = int(time.time())
+update_sql = "update action set update_time = "+str(update_time)+" where id = 1"
+# 执行sql语句
+cursor.execute(update_sql)
+# 提交到数据库执行
+db.commit()
+
 # 关闭数据库连接
 db.close()
 print("ok")

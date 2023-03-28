@@ -42,8 +42,34 @@
     <style>
         #desc {
             margin-left: 100px;
+        }
+        #desc-title {
+            font-size: 18px;
+            font-weight: bold;
+            line-height: 46px;
+        }
+        #desc-update-time {
+            font-size: 12px;
+        }
+
+        #right-top {
+            z-index: 6201;
+            right: 15px;
+            top: 15px;
+            position: absolute;
+            display: block;
+        }
+
+        #update-time {
+            position: relative;
+            width: 260px;
+            height: 45px;
+            box-sizing: border-box;
+            background: #fff;
+            border-radius: 3px;
             font-size: 16px;
             line-height: 46px;
+            padding-left: 25px;
         }
     </style>
 </head>
@@ -60,7 +86,8 @@
     <header class="searchbox">
         <img class="usel logo" src="../static/images/logo.png">
         <div id="desc">
-            - 进京证探头分布图
+            <div id="desc-title"> - 进京证探头分布图</div>
+<!--            <div id="desc-update-time">更新时间：2023-03-28 13:25</div>-->
         </div>
 
 <!--        <div id="nearbybox">-->
@@ -100,6 +127,12 @@
 <!--    <div class="dtrigger dragleft"></div>-->
 <!--    <div class="dtrigger dragright"></div>-->
 </section>
+
+<div id="right-top">
+    <div id="update-time">
+        更新时间：{{.updateTimeStr}}
+    </div>
+</div>
 
 <!-- 加载地图JSAPI脚本 -->
 <script src="https://a.amap.com/jsapi_demos/static/demo-center/js/demoutils.js"></script>
