@@ -381,6 +381,8 @@
                         search_info += '<div class="poi autocomplete-suggestion" data-index="'+i+'"><p><span class="sug_val"><strong>'+e.name+'</strong></span><span class="district" poiid="B0GRZO7OEV" adcode="110108">'+e.address+'</span></p></div>';
                         i++
                     })
+                } else {
+                    alert("地图搜索信息 API 今日调用量使用完了，明天再试吧")
                 }
                 $("#input-info").html(search_info)
             })
