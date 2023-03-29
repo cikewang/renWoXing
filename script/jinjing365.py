@@ -46,7 +46,7 @@ for val in labels_data:
 
 # 更新时间
 update_time = int(time.time())
-update_sql = "update action set update_time = "+str(update_time)+" where id = 1"
+update_sql = "update actions set update_time = "+str(update_time)+" where id = 1"
 # 执行sql语句
 cursor.execute(update_sql)
 # 提交到数据库执行
