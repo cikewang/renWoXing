@@ -119,7 +119,13 @@
             font-size: 14px;
             font-weight: bold;
         }
-
+        #gh-but{
+            right: 20px;
+            position: absolute;
+            margin-top: 10px;
+            /* color: #FFFFFF; */
+            font-size: 18px;
+        }
     </style>
 </head>
 <body>
@@ -183,6 +189,9 @@
 <div id="right-top">
     <div id="update-time">
         更新时间：{{.updateTimeStr}}
+    </div>
+    <div id="right-gh">
+        <button id="gh-but">智能线路规划</button>
     </div>
 </div>
 
@@ -389,10 +398,13 @@
         })
     }
 
-    // 驾车道路规划
+
+    let avoid_road = ""
+    var drivingObj
+        // 驾车道路规划
     function driving() {
         AMap.plugin('AMap.Driving', function() {
-            var driving = new AMap.Driving({
+            drivingObj = new AMap.Driving({
                 // 驾车路线规划策略，AMap.DrivingPolicy.LEAST_TIME是最快捷模式
                 policy: AMap.DrivingPolicy.LEAST_TIME,
                 // map 指定将路线规划方案绘制到对应的 AMap.Map 对象上
@@ -402,7 +414,9 @@
                 autoFitView: true,
             })
 
-            driving.setAvoidRoad("永丰路")
+            if (avoid_road) {
+                drivingObj.setAvoidRoad(avoid_road)
+            }
             // driving.setAvoidPolygons([
             //     [new AMap.LngLat(116.231524,40.069941), new AMap.LngLat(116.231782,40.070011), new AMap.LngLat(116.231739,40.069945), new AMap.LngLat(116.231519,40.0699)],
             //     [new AMap.LngLat(116.190256,40.06843), new AMap.LngLat(116.190503,40.068455), new AMap.LngLat(116.190508,40.068381), new AMap.LngLat(116.190283,40.068373)],
@@ -419,7 +433,7 @@
             //     // 未出错时，result即是对应的路线规划方案
             // })
 
-            driving.search(origin, destination, function (status, result) {
+            drivingObj.search(origin, destination, function (status, result) {
                 console.log("status = ", status)
                 console.log("result = ", result)
                 // 未出错时，result即是对应的路线规划方案
@@ -515,6 +529,13 @@
 
             // 道路规划
             driving();
+        });
+
+        $("#gh-but").click(function () {
+            alert("智能线路规划算法优化中，敬请期待...")
+            // drivingObj.clear()
+            // avoid_road = "永丰路"
+            // driving();
         });
     });
 
